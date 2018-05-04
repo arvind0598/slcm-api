@@ -1,0 +1,4 @@
+node_modules/
+src/report.html
+src/data/
+src/cred.json
