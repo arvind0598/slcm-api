@@ -38,13 +38,9 @@ module.exports = function getData() {
 
             .on("done", function(err, summary) {
                 fs.writeFileSync("./src/report.html", results[results.length - 1]);
-                const child = exec("cd src && python3 extract_data.py && cd ..", function(err) {
-                    if (err) {
-                        console.log(err);
-                        rej(err.toString());
-                    } else {
-                        res("completed.");
-                    }
+                const child = exec("python3 extract_data.py", function(err) {
+                    if (err) rej(err);
+                    res("completed");
                 });
             });
     });

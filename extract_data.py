@@ -10,11 +10,11 @@ def chunks(a, n):
 		yield a[i:i + n]
 
 #create the directory if it does not exist
-if not path.exists("./data"):
-	makedirs("data")
+if not path.exists("./src/data"):
+	makedirs("./src/data")
 
 #open the html file and parse it with beautifulSoup
-file = open("report.html")
+file = open("./src/report.html")
 soup = BeautifulSoup(file, "html.parser")
 file.close()
 
@@ -36,7 +36,7 @@ TO WRITE COURSES:
 		value = course name
 """
 
-file = open("./data/courses.json", "w+")
+file = open("./src/data/courses.json", "w+")
 file.write(json.dumps(courses))
 file.close()
 
@@ -64,7 +64,7 @@ for i in course_codes:
 		course_marks[x[0]] = indiv_marks 
 	marks[i] = course_marks
 
-file = open("./data/marks.json", "w+")
+file = open("./src/data/marks.json", "w+")
 file.write(json.dumps(marks))
 file.close()
 
@@ -87,8 +87,8 @@ for i in att_arr[1:]:
 	sub_att["present"] = i[5]
 	att[i[2]] = sub_att
 
-file = open("./data/att.json", "w+")
+file = open("./src/data/att.json", "w+")
 file.write(json.dumps(att))
 file.close()
 
-remove("./report.html")
+remove("./src/report.html")
