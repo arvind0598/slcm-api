@@ -11,26 +11,42 @@ API for SLCM made using:
 
 This is currently under development and is my first back-end project.
 It is extremely insecure to use on a larger scale, and I'd like help in getting it faster and more secure.
+Plus there's very poor error handling, please help out there.
 
 ---
 
 ## INSTRUCTIONS
 
-First run ```npm install``` or ```yarn add``` to install dependencies.
-Start the server using ```node script.js ```.
+Set up a LAMP stack on your system.
 
 #### First Time Setup
 
-Submit a POST request to ```localhost:8080/setData```, that contains _username_ and _password_ fields.
+First run ```yarn add``` to install dependencies.
+
+Start the server using ```yarn start```.
+
+Send a GET request to ```localhost:8080/createDatabase``` to make the database and tables.
+
+_NOTE: the above route is not made yet. You'll find the PHPMyAdmin dump at src/mysql/_
+
+##### Getting API KEY
+
+Send a GET request to ```localhost:8080/registerClient``` to get the API KEY.
+
+##### Logging in per end-user
+
+Submit a POST request to ```localhost:8080/setData```.
+Should contain:  _key_, _username_ and _password_ fields.
 I used the __x-www-form-urlencoded__ option on postman.
 This initializes the ```cred.json``` file.
 
-Submit an empty POST request to ```localhost:8080/updateData```.
+Submit an POST request with the key to ```localhost:8080/updateData```.
 This will run the collection and create the ```data``` folder within ```src```.
 
 #### Fetching Data
 
-There are three routes that return JSONS when you send a POST request
+There are three routes that return JSONS when you send a POST request with a valid key.
+
 1. ```localhost:8080/getCourses```
 	
 	```

@@ -5,14 +5,25 @@ Contains all the routes that are supported by the app.
 const fs = require("fs");
 const updateData = require("./updateData");
 const updateCredentials = require("./updateCredentials");
-const registerClient = require("./src/mysql/register.js");
-const verifyKey = require("./src/mysql/verifyKey.js");
+const registerClient = require("./src/mysql/registerClient");
+const verifyKey = require("./src/mysql/verifyKey");
+const createDatabase = require("./src/mysql/createDatabase");
 
 module.exports = function(app) {
 
     app.get("/", function(req, res) {
         res.send("Server running.");
     });
+
+    app.get("/createDatabase", function(req, res) {
+        createDatabase().then(
+            function(x){
+                res.send("database created.");
+            }, function(x) {
+                res.send("database not created");
+            }
+        );
+    })
 
     app.get("/registerClient", function(req, res) {
         let promise = registerClient();
