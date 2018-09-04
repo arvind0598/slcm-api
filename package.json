@@ -1,19 +1,19 @@
 {
   "name": "slcm-api",
-  "version": "1.1",
+  "version": "1.0.0",
+  "description": "an api for slcm.manipal.edu",
+  "author": "arvind0598",
   "license": "MIT",
   "dependencies": {
-    "body-parser": "^1.18.2",
     "express": "^4.16.3",
     "fs": "^0.0.1-security",
-    "mysql": "^2.15.0",
-    "newman": "^3.9.3",
-    "uuid": "^3.2.1"
+    "node-html-parser": "^1.1.8"
   },
   "devDependencies": {
-    "nodemon": "^1.17.3"
+    "nodemon": "^1.18.3"
   },
   "scripts": {
-    "start": "nodemon server.js"
+    "server": "nodemon server.js",
+    "slcm": "nodemon slcm.js"
   }
 }
