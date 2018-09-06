@@ -155,7 +155,7 @@ app.post("/api", (request, response) => {
 						const course = html.querySelector("#2").querySelector("tbody").removeWhitespace();
 						let course_list = {};
 
-						fs.writeFileSync("index.html", course);
+						// fs.writeFileSync("index.html", course);
 
 						for(let item in course.childNodes) {
 							let code = course.childNodes[item].childNodes[0].rawText.split(" ").join("");
@@ -178,7 +178,7 @@ app.post("/api", (request, response) => {
 
 						// console.log(att_table);
 						for(let item in att_table) {
-							console.log(att_table[item].rawText);
+							// console.log(att_table[item].rawText);
 							let name = att_table[item].childNodes[2].rawText.split(" ").join("");
 							attendance[name] = {
 								"present" : att_table[item].childNodes[5].rawText,
@@ -188,7 +188,7 @@ app.post("/api", (request, response) => {
 
 						// processing marks, but SLCM is broken nevertheless
 
-						let marks = [];
+						let marks = {};
 
 						response.json({
 							"error" : false,

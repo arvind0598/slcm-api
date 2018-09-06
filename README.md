@@ -2,8 +2,9 @@
 
 API for SLCM made using:
 * NodeJS and ExpressJS for Backend.
-* Postman for the actual API collection.
-* Python3 with BeautifulSoup for data processing.
+* node-html-parser with for data processing.
+
+An earlier version was made that used BeautifulSoup with Python and a Newman script to do the same thing, but this works a lot faster so I switched over.
 
 ---
 
@@ -13,83 +14,67 @@ This is currently under development and is my first back-end project.
 It is extremely insecure to use on a larger scale, and I'd like help in getting it faster and more secure.
 Plus there's very poor error handling, please help out there.
 
+Ps. SLCM does not have marks yet.
+
 ---
-
-## INSTRUCTIONS
-
-Set up a LAMP stack on your system.
-
-#### First Time Setup
-
-First run ```yarn add``` to install dependencies.
-
-Start the server using ```yarn start```.
-
-Send a GET request to ```localhost:8080/createDatabase``` to make the database and tables.
-
-_NOTE: the above route is not made yet. You'll find the PHPMyAdmin dump at src/mysql/_
-
-##### Getting API KEY
-
-Send a GET request to ```localhost:8080/registerClient``` to get the API KEY.
-
-##### Logging in per end-user
-
-Submit a POST request to ```localhost:8080/setData```.
-Should contain:  _key_, _username_ and _password_ fields.
-I used the __x-www-form-urlencoded__ option on postman.
-This initializes the ```cred.json``` file.
-
-Submit an POST request with the key to ```localhost:8080/updateData```.
-This will run the collection and create the ```data``` folder within ```src```.
 
 #### Fetching Data
 
-There are three routes that return JSONS when you send a POST request with a valid key.
+```
+{
+	username : 160953104
+	password : password
+}
+```
 
-1. ```localhost:8080/getCourses```
-	
-	```
-	{
-		subject_code1: subject_name1
-		subject_code2: subject_name2
-		subject_coden: subject_namen
-	}
-	```
+Send a x-www-form-urlencoded POST request of the above format to ```locahost:8080/api``` and get:
 
-2. ```localhost:8080/getMarks```
+```
+{
+    "error": false,
+    "name": "ARVIND S",
+    "courses": {
+        "ICT3161": {
+            "name": "RATIONAL UNIFIED PROCESS LAB",
+            "sem": "V",
+            "cred": "1.00"
+        },
+        "ICT3162": {
+            "name": "DATABASE SYSTEMS LAB",
+            "sem": "V",
+            "cred": "2.00"
+        },
+        "ICT3151": {
+            "name": "FUNDAMENTALS OF ALGORITHM ANALYSIS AND DESIGN",
+            "sem": "V",
+            "cred": "3.00"
+        },
+        "ICT3152": {
+            "name": "HIGH SPEED COMMUNICATION NETWORKS AND PROGRAMMING",
+            "sem": "V",
+            "cred": "4.00"
+        }
+    },
+    "marks": {},
+    "att": {
+        "ICT3151": {
+            "present": "13",
+            "total": "13"
+        },
+        "ICT3152": {
+            "present": "17",
+            "total": "20"
+        },
+        "ICT3153": {
+            "present": "14",
+            "total": "15"
+        },
+        "ICT3154": {
+            "present": "10",
+            "total": "12"
+        }
+    }
+}
+```
 
-	```
-	{
-		subject_code1: {
-			marks_total:
-			marks_got:
-		},
-		subject_code2: {
-			marks_total:
-			marks_got:
-		},
-		subject_coden: {
-			marks_total:
-			marks_got:
-		}
-	}
-	```
-
-3. ```localhost:8080/getAttendance```
-
-	```
-	{
-		subject_code1: {
-			total:
-			present:
-		},
-		subject_code2: {
-			total:
-			present:
-		},
-		subject_coden: {
-			total:
-			present:
-		}
-	}
+There is a ```status``` field that will be present if the ```error``` field is true, that explains why the error happened.
