@@ -8,7 +8,7 @@ const qs = require("querystring");
 const parser = require("node-html-parser");
 
 // fs may be used later to write responses to file
-const fs = require("fs");
+// const fs = require("fs");
 
 // TO DO : use sqlite to store responses
 
@@ -18,13 +18,21 @@ let password = "";
 // Express Server
 const express = require("express");
 const app = express();
-const port = process.env.port || 5000;
+const port = process.env.port || 8080;
 
 app.use(express.urlencoded({
 	extended : true
 }));
 
 app.listen(port, () => console.log("API is ready."));
+
+// enabling CORS
+
+app.all("/*", (req, res, next) => {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "X-Requested-With");
+	next();
+});
 
 // DATA
 
@@ -88,9 +96,17 @@ let get_data_options = {
 
 // helper functions
 
-const is_empty = str => (!str || 0 === str.length);
+const is_empty = str => !str || 0 === str.length;
 
 // REQUESTS
+
+app.get("/", (request, response) => {
+	response.send("api works");
+});
+
+app.get("/api", (request, response) => {
+	response.send("send POST");
+});
 
 app.post("/api", (request, response) => {
 

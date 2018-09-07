@@ -13,7 +13,7 @@
     "nodemon": "^1.18.3"
   },
   "scripts": {
-    "server": "nodemon server.js",
-    "slcm": "nodemon slcm.js"
+    "dev": "nodemon slcm.js",
+    "start": "node slcm.js"
   }
 }
