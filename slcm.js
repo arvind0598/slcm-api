@@ -98,6 +98,92 @@ let get_data_options = {
 
 const is_empty = str => !str || 0 === str.length;
 
+const parse_html = body => (new Promise((resolve, reject) => {
+	let html = null;
+	try {
+		html = parser.parse(body);
+	}
+	catch (err) {
+		reject(err);
+	}
+	resolve(html);
+}));
+
+const fetch_courses = html => (new Promise((resolve, reject) => {
+	let courses = {};
+	let course_table = null;
+
+	try {
+		course_table = html.querySelector("#2").querySelector("tbody").removeWhitespace();
+		for(let item in course_table.childNodes) {
+			let code = course_table.childNodes[item].childNodes[0].rawText.split(" ").join("");
+			let name = course_table.childNodes[item].childNodes[1].rawText;
+			let sem = course_table.childNodes[item].childNodes[4].rawText;
+			let cred = course_table.childNodes[item].childNodes[5].rawText;
+			courses[code] = {
+				"name" : name,
+				"sem" : sem,
+				"cred" : cred
+			};
+		}
+		// console.log(courses);
+	}
+	catch (err) {
+		reject(err);
+	}
+	resolve(courses);
+}));
+
+const fetch_attendance = html => (new Promise((resolve, reject) => {
+	let attendance = {};
+	let att_table = null;
+
+	try {
+		att_table = html.querySelector("#tblAttendancePercentage").removeWhitespace().childNodes[1].childNodes;
+		for(let item in att_table) {
+			let name = att_table[item].childNodes[2].rawText.split(" ").join("");
+			attendance[name] = {
+				"present" : att_table[item].childNodes[5].rawText,
+				"total" : att_table[item].childNodes[4].rawText
+			}
+		}
+		// console.log(attendance);
+	}
+
+	catch(err) {
+		reject(err);
+	}
+	resolve(attendance);					
+}));
+
+const fetch_marks = html => (new Promise((resolve, reject) => {
+	let marks = [];
+	// console.log(marks);
+	resolve(marks);
+}));
+
+const fetch_name = html => (new Promise((resolve, reject) => {
+	let name = null;
+	try {
+		name = html.querySelector("#lblUserName").removeWhitespace().rawText;
+		console.log(name);
+	}
+	catch(err) {
+		reject(err);
+	}
+	resolve(name);
+}));
+
+const fetch_courses_attendance_name_marks = html => (new Promise((resolve, reject) => {
+	let result = null;
+	Promise.all([fetch_name(html), fetch_marks(html), fetch_attendance(html), fetch_courses(html)]).then(result => {
+		resolve(result);
+	}).catch(err => {
+		console.log(err);
+		reject(err);
+	});	
+}));
+
 // REQUESTS
 
 app.get("/", (request, response) => {
@@ -159,6 +245,13 @@ app.post("/api", (request, response) => {
 
 				res.on("end", () => {
 					let body = Buffer.concat(chunks);
+					if(body.length > 100) {
+						response.json({
+							error : true,
+							error_reason : "details incorrect."
+						});
+						return;
+					}
 				});
 
 				let get_data_req = http.request(get_data_options, res => {
@@ -166,55 +259,19 @@ app.post("/api", (request, response) => {
 					res.on("data", chunk => chunks.push(chunk));
 					res.on("end", () => {
 						let body = Buffer.concat(chunks).toString();
-						const html = parser.parse(body);
-
-						const course = html.querySelector("#2").querySelector("tbody").removeWhitespace();
-						let course_list = {};
-
-						// fs.writeFileSync("index.html", course);
-
-						for(let item in course.childNodes) {
-							let code = course.childNodes[item].childNodes[0].rawText.split(" ").join("");
-							let name = course.childNodes[item].childNodes[1].rawText;
-							let sem = course.childNodes[item].childNodes[4].rawText;
-							let cred = course.childNodes[item].childNodes[5].rawText;
-							course_list[code] = {
-								"name" : name,
-								"sem" : sem,
-								"cred" : cred
-							};
-
-						}
-
-						// processing attendance later because SLCM is broken
-
-						let attendance = {};
-
-						const att_table = html.querySelector("#tblAttendancePercentage").removeWhitespace().childNodes[1].childNodes;
-
-						// console.log(att_table);
-						for(let item in att_table) {
-							// console.log(att_table[item].rawText);
-							let name = att_table[item].childNodes[2].rawText.split(" ").join("");
-							attendance[name] = {
-								"present" : att_table[item].childNodes[5].rawText,
-								"total" : att_table[item].childNodes[4].rawText
-							}
-						}
-
-						// processing marks, but SLCM is broken nevertheless
-
-						let marks = {};
-
-						response.json({
-							"error" : false,
-							"name" : html.querySelector("#lblUserName").removeWhitespace().rawText,
-							"courses" : course_list,
-							"marks" : marks,
-							"att" : attendance
+						
+						parse_html(body)
+						.then(html => fetch_courses_attendance_name_marks(html))
+						.then(result => {
+							response.json({
+								"error" : false,
+								"name" : result[0],
+								"marks" : result[1],
+								"att" : result[2],
+								"courses" :  result[3]
+							});
+							console.timeEnd("req");
 						});
-
-						console.timeEnd("req");
 					});
 				});
 
