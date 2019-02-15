@@ -1,19 +1,46 @@
+require 'sinatra'
+require 'json'
+
 require_relative 'script.rb'
 require_relative 'parser.rb'
+require_relative 'utils.rb'
 
-def get_test_credentials
-  file = File.read('config.json')
-  JSON.parse(file)
+# Sample route
+get '/' do
+  'API is live.'
 end
 
-cred = get_test_credentials()
+# Test route to check if login works
+post '/login' do
+  content_type :json
+  data = JSON.parse(request.body.read)
+  username, password, error = check_credentials(data)
+  
+  unless error.nil? 
+    return error 
+  end
 
-session = SLCM.get_session_cookie()
-login_status = SLCM.login_user(cred['username'], cred['password'], session)
-
-if login_status[:success]
-  academics_html = SLCM.get_academics_page(session)
-  academics_data = Parser.get_academics_details(academics_html)
-else
-  puts 'Login was not succesful'
+  session = SLCM.get_session_cookie()
+  SLCM.login_user(username, password, session).to_json
 end
+
+# Route to fetch attendance
+post '/bunks' do
+  content_type :json
+  data = JSON.parse(request.body.read)
+  username, password, error = check_credentials(data)
+
+  unless error.nil? 
+    return error 
+  end
+
+  session = SLCM.get_session_cookie()
+  login_status = SLCM.login_user(username, password, session)
+  unless login_status[:success]
+    return login_status.to_json
+  end
+
+  html = SLCM.get_academics_page(session)
+  attendance_details = Parser.get_attendance(html)
+  { success: true, data: attendance_details }.to_json
+end 

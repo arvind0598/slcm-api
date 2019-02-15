@@ -28,7 +28,6 @@ class SLCM
   end
   
   def self.login_user(username, password, session)
-    # TODO: check if username and password are valid
     post_body = $slcm.make_post_body(username, password)
     post_headers = $slcm.make_post_headers(post_body.to_json.length.to_s, session)
     response = HTTParty.post(
@@ -37,8 +36,12 @@ class SLCM
       headers: post_headers,
       body: post_body,
     )
-    # TODO: check if login was successful
-    return send_status(true, 'Login Successful!')
+    status = response.length < 100
+    if status 
+      return send_status(true, 'Login Successful!')
+    else
+      return send_status(false, 'Invalid Credentials.')
+    end
   end
   
   def self.get_academics_page(session)

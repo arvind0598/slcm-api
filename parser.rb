@@ -36,14 +36,4 @@ class Parser
     }
     return attendance_map
   end
-
-  def self.get_academics_details(html)
-    courses = get_courses(html)
-    attendance = get_attendance(html)
-    details = {
-      courses: courses,
-      attendance: attendance,
-    }
-    return details.to_json
-  end
 end
