@@ -1,5 +1,3 @@
-require 'nokogiri'
-require 'open-uri'
 require 'net/http'
 require 'httparty'
 require 'json'
@@ -8,7 +6,7 @@ require 'pry'
 require_relative 'slcm.rb'
 
 $slcm = Site.new
-$timeout = 10
+$timeout = 20
 
 class SLCM
 
