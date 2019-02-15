@@ -1,12 +1,12 @@
 # SLCM API
 
-API for SLCM made using Sinatra and Nogokiri.
+API for SLCM made using Sinatra and Nokogiri.
 
 ## Pre setup instructions
 
 If you're using a Ruby build provided by Ubuntu, uninstall it with ```sudo apt remove ruby``` followed by ```sudo apt autoremove```.
 
-Install rbenv using **[rbenv](https://github.com/rbenv/rbenv#installation)**.
+Install **rbenv** using the instructions [here](https://github.com/rbenv/rbenv#installation).
 Further, install **[ruby-build](https://github.com/rbenv/ruby-build)** as a rbenv plugin.
 
 Install Ruby. This is the latest version as of writing this document.
