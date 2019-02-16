@@ -1,8 +1,11 @@
+require 'cgi'
+
 class Site
   @@url = {
     base: 'slcm.manipal.edu',
     login: '/loginForm.aspx',
     academics: '/Academics.aspx',
+    grades: '/GradeSheet.aspx',
   }
 
   # header to be attached with every GET request made after logging in
@@ -41,10 +44,14 @@ class Site
     URI('https://' + @@url[:base] + @@url[:academics])
   end
 
+  def get_grades_url
+    URI('https://' + @@url[:base] + @@url[:grades])
+  end
+
   # Expects the set-cookie header, and parses it to return just the Session ID
   # This works because there is a constant format to the string.
   # Example Input: ASP.NET_SessionId=tb4sflkpjbhutvfw1sioh5kv; path=/; HttpOnly
-  # Example Output: 
+  # Example Output: ASP.NET_SessionId=tb4sflkpjbhutvfw1sioh5kv;
   def parse_session_cookie(cookie)
     cookie.split(';').first
   end
@@ -52,7 +59,11 @@ class Site
   # Expects the username and password for logging in, and places it in the template
   # This works because the other values are constant in every request made
   def make_post_body(username, password)
-    return "ScriptManager1=updpnl%7CbtnLogin&__EVENTTARGET=&__EVENTARGUMENT=&__VIEWSTATE=%2FwEPDwULLTE4NTA1MzM2ODIPZBYCAgMPZBYCAgMPZBYCZg9kFgICAw8PFgIeB1Zpc2libGVoZGRkZQeElbA4UBZ%2FsIRqcKZDYpcgTP0%3D&__VIEWSTATEGENERATOR=6ED0046F&__EVENTVALIDATION=%2FwEdAAbdzkkY3m2QukSc6Qo1ZHjQdR78oILfrSzgm87C%2Fa1IYZxpWckI3qdmfEJVCu2f5cEJlsYldsTO6iyyyy0NDvcAop4oRunf14dz2Zt2%2BQKDEIHFert2MhVDDgiZPfTqiMme8dYSy24aMNCGMYN2F8ckIbO3nw%3D%3D&txtUserid=#{username}&txtpassword=#{password}&__ASYNCPOST=true&btnLogin=Sign%20in";
+    "ScriptManager1=updpnl%7CbtnLogin&__EVENTTARGET=&__EVENTARGUMENT=&__VIEWSTATE=%2FwEPDwULLTE4NTA1MzM2ODIPZBYCAgMPZBYCAgMPZBYCZg9kFgICAw8PFgIeB1Zpc2libGVoZGRkZQeElbA4UBZ%2FsIRqcKZDYpcgTP0%3D&__VIEWSTATEGENERATOR=6ED0046F&__EVENTVALIDATION=%2FwEdAAbdzkkY3m2QukSc6Qo1ZHjQdR78oILfrSzgm87C%2Fa1IYZxpWckI3qdmfEJVCu2f5cEJlsYldsTO6iyyyy0NDvcAop4oRunf14dz2Zt2%2BQKDEIHFert2MhVDDgiZPfTqiMme8dYSy24aMNCGMYN2F8ckIbO3nw%3D%3D&txtUserid=#{username}&txtpassword=#{password}&__ASYNCPOST=true&btnLogin=Sign%20in";
+  end
+
+  def make_gradesheet_body(semester, viewstate, eventvalidation)
+    "ctl00%24ScriptManager1=ctl00%24ContentPlaceHolder1%24UpdatePanel1%7Cctl00%24ContentPlaceHolder1%24ddlSemester&__EVENTTARGET=ctl00%24ContentPlaceHolder1%24ddlSemester&__EVENTARGUMENT=&__LASTFOCUS=&__VIEWSTATE=#{CGI::escape(viewstate)}&__VIEWSTATEGENERATOR=47C4ACAC&__EVENTVALIDATION=#{CGI::escape(eventvalidation)}&ctl00%24ContentPlaceHolder1%24ddlSemester=#{semester}&__ASYNCPOST=true&"
   end
 
   # header generation
