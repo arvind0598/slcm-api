@@ -51,10 +51,8 @@ class Parser
 
   def self.get_grades_auth(html)
     data = Nokogiri::HTML(html)
-    # puts data
     viewstate = data.at('input[name="__VIEWSTATE"]')['value']
     eventvalidation = data.at('input[name="__EVENTVALIDATION"]')['value']
-    p viewstate, eventvalidation
     return viewstate, eventvalidation
   end
 

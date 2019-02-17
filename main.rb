@@ -19,7 +19,12 @@ post '/login' do
     return error 
   end
 
-  session = SLCM.get_session_cookie()
+  session_status = SLCM.get_session_cookie()
+  unless session_status[:success]
+    return session_status.to_json
+  end
+
+  session = session_status[:message]
   SLCM.login_user(username, password, session).to_json
 end
 
@@ -33,13 +38,22 @@ post '/bunks' do
     return error 
   end
 
-  session = SLCM.get_session_cookie()
+  session_status = SLCM.get_session_cookie()
+  unless session_status[:success]
+    return session_status.to_json
+  end
+  session = session_status[:message]
+  
   login_status = SLCM.login_user(username, password, session)
   unless login_status[:success]
     return login_status.to_json
   end
 
-  html = SLCM.get_academics_page(session)
+  html_success, html = SLCM.get_academics_page(session)
+  unless html_success
+    return Utils.send_status(false, 'An error occured.')
+  end
+
   details = Parser.get_attendance(html)
   { success: true, data: details }.to_json
 end
@@ -54,13 +68,22 @@ post '/courses' do
     return error 
   end
 
-  session = SLCM.get_session_cookie()
+  session_status = SLCM.get_session_cookie()
+  unless session_status[:success]
+    return session_status.to_json
+  end
+  session = session_status[:message]
+  
   login_status = SLCM.login_user(username, password, session)
   unless login_status[:success]
     return login_status.to_json
   end
 
-  html = SLCM.get_academics_page(session)
+  html_success, html = SLCM.get_academics_page(session)
+  unless html_success
+    return Utils.send_status(false, 'An error occured.')
+  end
+
   details = Parser.get_courses(html)
   { success: true, data: details }.to_json
 end
@@ -86,19 +109,48 @@ post '/grades' do
     return error 
   end
 
-  session = SLCM.get_session_cookie()
+  session_status = SLCM.get_session_cookie()
+  unless session_status[:success]
+    return session_status.to_json
+  end
+  session = session_status[:message]
+
   login_status = SLCM.login_user(username, password, session)
   unless login_status[:success]
     return login_status.to_json
   end
 
   # TODO: split auth data into own route
-  gradesheet_html = SLCM.get_gradesheet_page(session)
-  viewstate, eventvalidation = Parser.get_grades_auth(gradesheet_html)
-  puts viewstate, eventvalidation
+  gradesheet_html_success, gradesheet_html = SLCM.get_gradesheet_page(session)
+  unless gradesheet_html_success
+    return Utils.send_status(false, 'An error occured.')
+  end
 
-  html = SLCM.get_gradesheet_info(session, viewstate, eventvalidation, semester)
+  viewstate, eventvalidation = Parser.get_grades_auth(gradesheet_html)
+
+  html_success, html = SLCM.get_gradesheet_info(session, viewstate, eventvalidation, semester)
+  unless html_success
+    return Utils.send_status(false, 'An error occured.')
+  end
+
   details = Parser.get_grades(html)
   { success: true, data: details }.to_json
 end
 
+# Route to fetch student details
+post '/student' do
+  content_type :json
+  return Utils.send_status(false, 'Route is incomplete')
+end
+
+# Route to fetch internal marks details
+post '/marks' do
+  content_type :json
+  return Utils.send_status(false, 'Route is incomplete')
+end
+
+# Route to fetch all auth details
+post '/init' do
+  content_type :json
+  return Utils.send_status(false, 'Route is incomplete')
+end
