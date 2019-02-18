@@ -93,21 +93,15 @@ post '/grades' do
   content_type :json
   data = JSON.parse(request.body.read)
   username, password, error = Utils.check_credentials(data)
-
-  semester = data['semester']
-  if semester.nil?
-    return Utils.send_status(false, 'Semester is missing').to_json
-  else
-    conv_status = Utils.map_roman_integer(semester, :int_to_roman)
-    unless conv_status[:success]
-      return Utils.send_status(false, 'Semester is invalid').to_json
-    end
-    semester = conv_status[:message]
-  end
-
   unless error.nil? 
     return error 
   end
+
+  semester_status = Utils.check_semester(data)
+  unless semester_status[:success]
+    return semester_status.to_json
+  end
+  semester = semester_status[:message]
 
   session_status = SLCM.get_session_cookie()
   unless session_status[:success]
