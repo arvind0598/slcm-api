@@ -22,13 +22,4 @@ rbenv rehash
 
 Install dependencies with ```bundle install```.
 
-Create a file named config.json with the following structure:
-
-```json
-{
-  "username": "1609xxxxx",
-  "password": "password",
-}
-```
-
 Run the script with ```ruby main.rb```
