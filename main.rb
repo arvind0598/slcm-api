@@ -68,6 +68,12 @@ post '/courses' do
     return error 
   end
 
+  semester_status = Utils.check_semester(data)
+  unless semester_status[:success]
+    return semester_status.to_json
+  end
+  semester = semester_status[:message]
+
   session_status = SLCM.get_session_cookie()
   unless session_status[:success]
     return session_status.to_json
@@ -79,7 +85,14 @@ post '/courses' do
     return login_status.to_json
   end
 
-  html_success, html = SLCM.get_academics_page(session)
+  acadmics_html_success, academics_html = SLCM.get_academics_page(session)
+  unless academics_html_success
+    return Utils.send_status(false, 'An error occured.')
+  end
+
+  viewstate, eventvalidation = Parser.get_auth(academics_html)
+
+  html_success, html = SLCM.get_academics_info(session, viewstate, eventvalidation, semester)
   unless html_success
     return Utils.send_status(false, 'An error occured.')
   end
@@ -120,7 +133,7 @@ post '/grades' do
     return Utils.send_status(false, 'An error occured.')
   end
 
-  viewstate, eventvalidation = Parser.get_grades_auth(gradesheet_html)
+  viewstate, eventvalidation = Parser.get_auth(gradesheet_html)
 
   html_success, html = SLCM.get_gradesheet_info(session, viewstate, eventvalidation, semester)
   unless html_success
@@ -134,7 +147,31 @@ end
 # Route to fetch student details
 post '/student' do
   content_type :json
-  return Utils.send_status(false, 'Route is incomplete')
+  data = JSON.parse(request.body.read)
+  username, password, error = Utils.check_credentials(data)
+
+  unless error.nil? 
+    return error 
+  end
+
+  session_status = SLCM.get_session_cookie()
+  unless session_status[:success]
+    return session_status.to_json
+  end
+  session = session_status[:message]
+  
+  login_status = SLCM.login_user(username, password, session)
+  unless login_status[:success]
+    return login_status.to_json
+  end
+
+  html_success, html = SLCM.get_student_info(session)
+  unless html_success
+    return Utils.send_status(false, 'An error occured.')
+  end
+
+  details = Parser.get_profile(html)
+  return details.to_json
 end
 
 # Route to fetch internal marks details

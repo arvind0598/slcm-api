@@ -89,4 +89,18 @@ class SLCM
     end
     return true, response
   end
+
+  def self.get_student_info(session)
+    get_headers = $slcm.make_get_headers(session)
+    begin
+      response = HTTParty.get(
+        $slcm.get_profile_url(),
+        timeout: $timeout,
+        headers: get_headers,
+      )
+    rescue StandardError => error
+      return false, nil
+    end
+    return true, response
+  end
 end

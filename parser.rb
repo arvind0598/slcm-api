@@ -49,7 +49,7 @@ class Parser
     return attendance_map
   end
 
-  def self.get_grades_auth(html)
+  def self.get_auth(html)
     data = Nokogiri::HTML(html)
     viewstate = data.at('input[name="__VIEWSTATE"]')['value']
     eventvalidation = data.at('input[name="__EVENTVALIDATION"]')['value']
@@ -76,5 +76,20 @@ class Parser
 
     details = { cgpa: cgpa, gpa: gpa, credits: total_credits, grades: grades_map }
     return details
+  end
+
+  def self.get_profile(html)
+    data = Nokogiri::HTML(html)
+    profile_details = data.css('#ContentPlaceHolder1_pnlAdmission input.form-control')
+
+    response = {}
+    profile_details.each{ |x|
+      # TODO: Use substr instead of split, probably faster
+      key = x['name'].split('txt').last
+      value = x['value']
+      response[key] = value    
+    }
+
+    return response
   end
 end

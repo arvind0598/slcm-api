@@ -6,6 +6,7 @@ class Site
     login: '/loginForm.aspx',
     academics: '/Academics.aspx',
     grades: '/GradeSheet.aspx',
+    profile: '/StudentProfile.aspx',
   }
 
   # header to be attached with every GET request made after logging in
@@ -48,6 +49,10 @@ class Site
     URI('https://' + @@url[:base] + @@url[:grades])
   end
 
+  def get_profile_url
+    URI('https://' + @@url[:base] + @@url[:profile])
+  end
+
   # Expects the set-cookie header, and parses it to return just the Session ID
   # This works because there is a constant format to the string.
   # Example Input: ASP.NET_SessionId=tb4sflkpjbhutvfw1sioh5kv; path=/; HttpOnly
@@ -64,6 +69,10 @@ class Site
 
   def make_gradesheet_body(semester, viewstate, eventvalidation)
     "ctl00%24ScriptManager1=ctl00%24ContentPlaceHolder1%24UpdatePanel1%7Cctl00%24ContentPlaceHolder1%24ddlSemester&__EVENTTARGET=ctl00%24ContentPlaceHolder1%24ddlSemester&__EVENTARGUMENT=&__LASTFOCUS=&__VIEWSTATE=#{CGI::escape(viewstate)}&__VIEWSTATEGENERATOR=47C4ACAC&__EVENTVALIDATION=#{CGI::escape(eventvalidation)}&ctl00%24ContentPlaceHolder1%24ddlSemester=#{semester}&__ASYNCPOST=true&"
+  end
+
+  def make_academics_body(semester, viewstate, eventvalidation)
+    ""
   end
 
   # header generation
