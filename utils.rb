@@ -19,7 +19,6 @@ class Utils
       return Utils.send_status(false, 'Semester is missing')
     else
       conv_status = Utils.map_roman_integer(semester, :int_to_roman)
-      puts conv_status
       unless conv_status[:success]
         return Utils.send_status(false, 'Semester is invalid')
       end
@@ -35,12 +34,12 @@ class Utils
         status = roman_nums.find_index(num)
       else
         if num.to_i <= 0 
-          return send_status(false, 'An error occured!')
+          return send_status(false, 'Invalid semester.')
         end
         status = roman_nums.at(num.to_i)
       end
     rescue StandardError => error
-      return send_status(false, 'An error occured!')
+      return send_status(false, 'Invalid semester.')
     end
     return send_status(!status.nil?, status)
   end

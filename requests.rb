@@ -17,7 +17,7 @@ class SLCM
         timeout: $timeout,
       )
     rescue StandardError => error
-      return Utils.send_status(false, 'An error occured.')
+      return Utils.send_status(false, 'Could not initialize session.')
     end
     cookie = response.headers['set-cookie']
     session = $slcm.parse_session_cookie(cookie)
@@ -35,7 +35,7 @@ class SLCM
         body: post_body,
       )
     rescue StandardError => error
-      return Utils.send_status(false, 'An error occured.')
+      return Utils.send_status(false, 'Could not login.')
     end
     status = response.length < 100
     if status 
@@ -52,6 +52,23 @@ class SLCM
         $slcm.get_academics_url(),
         timeout: $timeout,
         headers: get_headers,
+      )
+    rescue StandardError => error
+      return false, nil
+    end
+    return true, response
+  end
+
+  def self.get_academics_info(session, viewstate, eventvalidation, semester)
+    post_body = $slcm.make_academics_body(semester, viewstate, eventvalidation)
+    post_headers = $slcm.make_post_headers(post_body.to_json.length.to_s, session)
+    post_headers['Referer'] = $slcm.get_academics_url().to_s
+    begin  
+      response = HTTParty.post(
+        $slcm.get_academics_url(),
+        timeout: $timeout,
+        headers: post_headers,
+        body: post_body,
       )
     rescue StandardError => error
       return false, nil

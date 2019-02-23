@@ -51,7 +51,7 @@ post '/bunks' do
 
   html_success, html = SLCM.get_academics_page(session)
   unless html_success
-    return Utils.send_status(false, 'An error occured.')
+    return Utils.send_status(false, 'An error occured.').to_json
   end
 
   details = Parser.get_attendance(html)
@@ -87,14 +87,14 @@ post '/courses' do
 
   academics_html_success, academics_html = SLCM.get_academics_page(session)
   unless academics_html_success
-    return Utils.send_status(false, 'An error occured.')
+    return Utils.send_status(false, 'An error occured a.').to_json
   end
 
   viewstate, eventvalidation = Parser.get_auth(academics_html)
 
   html_success, html = SLCM.get_academics_info(session, viewstate, eventvalidation, semester)
   unless html_success
-    return Utils.send_status(false, 'An error occured.')
+    return Utils.send_status(false, 'An error occured b.').to_json
   end
 
   details = Parser.get_courses(html)
@@ -130,14 +130,14 @@ post '/grades' do
   # TODO: split auth data into own route
   gradesheet_html_success, gradesheet_html = SLCM.get_gradesheet_page(session)
   unless gradesheet_html_success
-    return Utils.send_status(false, 'An error occured.')
+    return Utils.send_status(false, 'An error occured.').to_json
   end
 
   viewstate, eventvalidation = Parser.get_auth(gradesheet_html)
 
   html_success, html = SLCM.get_gradesheet_info(session, viewstate, eventvalidation, semester)
   unless html_success
-    return Utils.send_status(false, 'An error occured.')
+    return Utils.send_status(false, 'An error occured.').to_json
   end
 
   details = Parser.get_grades(html)
@@ -167,7 +167,7 @@ post '/student' do
 
   html_success, html = SLCM.get_student_page(session)
   unless html_success
-    return Utils.send_status(false, 'An error occured.')
+    return Utils.send_status(false, 'An error occured.').to_json
   end
 
   details = Parser.get_profile(html)
@@ -177,11 +177,11 @@ end
 # Route to fetch internal marks details
 post '/marks' do
   content_type :json
-  return Utils.send_status(false, 'Route is incomplete')
+  return Utils.send_status(false, 'Route is incomplete').to_json
 end
 
 # Route to fetch all auth details
 post '/init' do
   content_type :json
-  return Utils.send_status(false, 'Route is incomplete')
+  return Utils.send_status(false, 'Route is incomplete').to_json
 end

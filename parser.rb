@@ -16,14 +16,14 @@ class Parser
 
   def self.get_courses(html)
     data = Nokogiri::HTML(html)
-    course_details = data.css('#ContentPlaceHolder1_UpdatePanel1 .table.table-bordered td')
+    course_details = data.css('.row + .table-responsive.mt-10 .table.table-bordered td')
 
     course_map = {}
 
     course_details.each_slice(9) { |course|
       subject_code = course[0].text.split.join
       name = get_course_name(course[1].text)
-      semester = course[4].text
+      semester = Utils.map_roman_integer(course[4].text, :roman_to_int)[:message]
       credits = course[5].text.to_f
       course_map[subject_code] = { name: name, semester: semester, credits: credits }
     }
