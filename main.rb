@@ -85,7 +85,7 @@ post '/courses' do
     return login_status.to_json
   end
 
-  acadmics_html_success, academics_html = SLCM.get_academics_page(session)
+  academics_html_success, academics_html = SLCM.get_academics_page(session)
   unless academics_html_success
     return Utils.send_status(false, 'An error occured.')
   end
@@ -165,7 +165,7 @@ post '/student' do
     return login_status.to_json
   end
 
-  html_success, html = SLCM.get_student_info(session)
+  html_success, html = SLCM.get_student_page(session)
   unless html_success
     return Utils.send_status(false, 'An error occured.')
   end

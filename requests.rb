@@ -90,7 +90,7 @@ class SLCM
     return true, response
   end
 
-  def self.get_student_info(session)
+  def self.get_student_page(session)
     get_headers = $slcm.make_get_headers(session)
     begin
       response = HTTParty.get(
