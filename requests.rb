@@ -17,7 +17,7 @@ class SLCM
         timeout: $timeout,
       )
     rescue StandardError => error
-      return Utils.send_status(false, 'Could not initialize session.')
+      return Utils.send_status(false, 'Could not connect to SLCM.')
     end
     cookie = response.headers['set-cookie']
     session = $slcm.parse_session_cookie(cookie)
