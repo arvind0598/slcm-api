@@ -16,13 +16,13 @@ class Utils
   def self.check_semester(data)
     semester = data['semester']
     if semester.nil?
-      return Utils.send_status(false, 'Semester is missing')
+      return send_status(false, 'Semester is missing')
     else
-      conv_status = Utils.map_roman_integer(semester, :int_to_roman)
+      conv_status = map_roman_integer(semester, :int_to_roman)
       unless conv_status[:success]
-        return Utils.send_status(false, 'Semester is invalid')
+        return send_status(false, 'Semester is invalid')
       end
-      return Utils.send_status(true, conv_status[:message])
+      return send_status(true, conv_status[:message])
     end
   end
 
