@@ -75,6 +75,10 @@ class Site
     "ctl00%24ScriptManager1=ctl00%24ContentPlaceHolder1%24UpdatePanel1%7Cctl00%24ContentPlaceHolder1%24LinkButton1&__EVENTTARGET=ctl00%24ContentPlaceHolder1%24LinkButton1&__EVENTARGUMENT=&__LASTFOCUS=&__VIEWSTATE=#{CGI::escape(viewstate)}&__VIEWSTATEGENERATOR=2FB222ED&__EVENTVALIDATION=#{CGI::escape(eventvalidation)}&ctl00%24ContentPlaceHolder1%24ddlSemesterCourseDetails=#{semester}&ctl00%24ContentPlaceHolder1%24txtAttenFromDate=&ctl00%24ContentPlaceHolder1%24txtAttenToDate=&__ASYNCPOST=true&"
   end
 
+  def make_marks_body(semester, viewstate, eventvalidation)
+    "ctl00%24ScriptManager1=ctl00%24ContentPlaceHolder1%24updpnlInternalMark%7Cctl00%24ContentPlaceHolder1%24lnkBtnInternalMark&ctl00%24ContentPlaceHolder1%24ddlInternalSemester=#{semester}&__EVENTTARGET=ctl00%24ContentPlaceHolder1%24lnkBtnInternalMark&__EVENTARGUMENT=&__LASTFOCUS=&__VIEWSTATE=#{CGI::escape(viewstate)}&__VIEWSTATEGENERATOR=2FB222ED&__EVENTVALIDATION=#{CGI::escape(eventvalidation)}&__ASYNCPOST=true"
+  end
+
   # header generation
   def make_post_headers(length, session)
     @@post_header_data['Content-Length'] = length

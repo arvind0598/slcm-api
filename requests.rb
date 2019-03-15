@@ -76,6 +76,23 @@ class SLCM
     return true, response
   end
 
+  def self.get_marks_info(session, viewstate, eventvalidation, semester)
+    post_body = $slcm.make_marks_body(semester, viewstate, eventvalidation)
+    post_headers = $slcm.make_post_headers(post_body.to_json.length.to_s, session)
+    post_headers['Referer'] = $slcm.get_academics_url().to_s
+    begin  
+      response = HTTParty.post(
+        $slcm.get_academics_url(),
+        timeout: $timeout,
+        headers: post_headers,
+        body: post_body,
+      )
+    rescue StandardError => error
+      return false, nil
+    end
+    return true, response
+  end
+
   def self.get_gradesheet_page(session)
     get_headers = $slcm.make_get_headers(session)
     begin

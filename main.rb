@@ -87,14 +87,14 @@ post '/courses' do
 
   academics_html_success, academics_html = SLCM.get_academics_page(session)
   unless academics_html_success
-    return Utils.send_status(false, 'An error occured a.').to_json
+    return Utils.send_status(false, 'An error occured.').to_json
   end
 
   viewstate, eventvalidation = Parser.get_auth(academics_html)
 
   html_success, html = SLCM.get_academics_info(session, viewstate, eventvalidation, semester)
   unless html_success
-    return Utils.send_status(false, 'An error occured b.').to_json
+    return Utils.send_status(false, 'An error occured.').to_json
   end
 
   details = Parser.get_courses(html)
@@ -177,10 +177,47 @@ end
 # Route to fetch internal marks details
 post '/marks' do
   content_type :json
-  return Utils.send_status(false, 'Route is incomplete').to_json
+  data = JSON.parse(request.body.read)
+  username, password, error = Utils.check_credentials(data)
+
+  unless error.nil? 
+    return error 
+  end
+
+  semester_status = Utils.check_semester(data)
+  unless semester_status[:success]
+    return semester_status.to_json
+  end
+  semester = semester_status[:message]
+
+  session_status = SLCM.get_session_cookie()
+  unless session_status[:success]
+    return session_status.to_json
+  end
+  session = session_status[:message]
+  
+  login_status = SLCM.login_user(username, password, session)
+  unless login_status[:success]
+    return login_status.to_json
+  end
+
+  academics_html_success, academics_html = SLCM.get_academics_page(session)
+  unless academics_html_success
+    return Utils.send_status(false, 'An error occured.').to_json
+  end
+
+  viewstate, eventvalidation = Parser.get_auth(academics_html)
+
+  html_success, html = SLCM.get_marks_info(session, viewstate, eventvalidation, semester)
+  unless html_success
+    return Utils.send_status(false, 'An error occured.').to_json
+  end
+
+  details = Parser.get_internal_marks(html)
+  { success: true, data: details }.to_json
 end
 
-# Route to fetch all auth details
+# Route to fetch all details
 post '/init' do
   content_type :json
   return Utils.send_status(false, 'Route is incomplete').to_json

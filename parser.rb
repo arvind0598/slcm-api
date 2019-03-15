@@ -78,6 +78,35 @@ class Parser
     return details
   end
 
+  def self.get_internal_marks(html)
+    data = Nokogiri::HTML(html)
+    marks_details = data.css('.panel-collapse.collapse')
+
+    marks_map = {}
+
+    marks_details.each{ |x|
+      subject_code = x['id']
+      subject_marks_details = x.css('td')
+      subject_map = {}
+
+      subject_marks_details.each_slice(3) { |test|
+        name = test[0].text
+        if name.include?'Total'
+          next
+        end
+
+        total = test[1].text.to_f
+        score = test[2].text.to_f
+        subject_marks = { score: score, total: total }
+        subject_map[name] = subject_marks
+      }
+
+      marks_map[subject_code] = subject_map
+    }
+
+    marks_map
+  end
+
   def self.get_profile(html)
     data = Nokogiri::HTML(html)
     profile_details = data.css('#ContentPlaceHolder1_pnlAdmission input.form-control')
