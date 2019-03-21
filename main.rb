@@ -32,26 +32,16 @@ end
 post '/bunks' do
   content_type :json
   data = JSON.parse(request.body.read)
-  username, password, error = Utils.check_credentials(data)
-
-  unless error.nil? 
-    return error 
+  auth_status = Utils.auth_request(data)
+  unless auth_status[:success]
+    return auth_status.to_json
   end
 
-  session_status = SLCM.get_session_cookie()
-  unless session_status[:success]
-    return session_status.to_json
-  end
-  session = session_status[:message]
-  
-  login_status = SLCM.login_user(username, password, session)
-  unless login_status[:success]
-    return login_status.to_json
-  end
+  session = auth_status[:message]
 
   html_success, html = SLCM.get_academics_page(session)
   unless html_success
-    return Utils.send_status(false, 'An error occured.').to_json
+    return Utils.send_failure()
   end
 
   details = Parser.get_attendance(html)
@@ -62,39 +52,24 @@ end
 post '/courses' do
   content_type :json
   data = JSON.parse(request.body.read)
-  username, password, error = Utils.check_credentials(data)
-
-  unless error.nil? 
-    return error 
+  auth_status = Utils.auth_request_with_semester(data)
+  unless auth_status[:success]
+    return auth_status.to_json
   end
 
-  semester_status = Utils.check_semester(data)
-  unless semester_status[:success]
-    return semester_status.to_json
-  end
-  semester = semester_status[:message]
-
-  session_status = SLCM.get_session_cookie()
-  unless session_status[:success]
-    return session_status.to_json
-  end
-  session = session_status[:message]
-  
-  login_status = SLCM.login_user(username, password, session)
-  unless login_status[:success]
-    return login_status.to_json
-  end
+  semester = auth_status[:semester]
+  session = auth_status[:session]
 
   academics_html_success, academics_html = SLCM.get_academics_page(session)
   unless academics_html_success
-    return Utils.send_status(false, 'An error occured.').to_json
+    return Utils.send_failure()
   end
 
   viewstate, eventvalidation = Parser.get_auth(academics_html)
 
   html_success, html = SLCM.get_academics_info(session, viewstate, eventvalidation, semester)
   unless html_success
-    return Utils.send_status(false, 'An error occured.').to_json
+    return Utils.send_failure()
   end
 
   details = Parser.get_courses(html)
@@ -105,39 +80,24 @@ end
 post '/grades' do
   content_type :json
   data = JSON.parse(request.body.read)
-  username, password, error = Utils.check_credentials(data)
-  unless error.nil? 
-    return error 
+  auth_status = Utils.auth_request_with_semester(data)
+  unless auth_status[:success]
+    return auth_status.to_json
   end
 
-  semester_status = Utils.check_semester(data)
-  unless semester_status[:success]
-    return semester_status.to_json
-  end
-  semester = semester_status[:message]
+  semester = auth_status[:semester]
+  session = auth_status[:session]
 
-  session_status = SLCM.get_session_cookie()
-  unless session_status[:success]
-    return session_status.to_json
-  end
-  session = session_status[:message]
-
-  login_status = SLCM.login_user(username, password, session)
-  unless login_status[:success]
-    return login_status.to_json
-  end
-
-  # TODO: split auth data into own route
   gradesheet_html_success, gradesheet_html = SLCM.get_gradesheet_page(session)
   unless gradesheet_html_success
-    return Utils.send_status(false, 'An error occured.').to_json
+    return Utils.send_failure()
   end
 
   viewstate, eventvalidation = Parser.get_auth(gradesheet_html)
 
   html_success, html = SLCM.get_gradesheet_info(session, viewstate, eventvalidation, semester)
   unless html_success
-    return Utils.send_status(false, 'An error occured.').to_json
+    return Utils.send_failure()
   end
 
   details = Parser.get_grades(html)
@@ -148,69 +108,45 @@ end
 post '/student' do
   content_type :json
   data = JSON.parse(request.body.read)
-  username, password, error = Utils.check_credentials(data)
 
-  unless error.nil? 
-    return error 
+  auth_status = Utils.auth_request(data)
+  unless auth_status[:success]
+    return auth_status.to_json
   end
 
-  session_status = SLCM.get_session_cookie()
-  unless session_status[:success]
-    return session_status.to_json
-  end
-  session = session_status[:message]
-  
-  login_status = SLCM.login_user(username, password, session)
-  unless login_status[:success]
-    return login_status.to_json
-  end
+  session = auth_status[:message]
 
   html_success, html = SLCM.get_student_page(session)
   unless html_success
-    return Utils.send_status(false, 'An error occured.').to_json
+    return Utils.send_failure()
   end
 
   details = Parser.get_profile(html)
-  return details.to_json
+  { success: true, data: details }.to_json
 end
 
 # Route to fetch internal marks details
 post '/marks' do
   content_type :json
   data = JSON.parse(request.body.read)
-  username, password, error = Utils.check_credentials(data)
-
-  unless error.nil? 
-    return error 
+  auth_status = Utils.auth_request_with_semester(data)
+  unless auth_status[:success]
+    return auth_status.to_json
   end
 
-  semester_status = Utils.check_semester(data)
-  unless semester_status[:success]
-    return semester_status.to_json
-  end
-  semester = semester_status[:message]
-
-  session_status = SLCM.get_session_cookie()
-  unless session_status[:success]
-    return session_status.to_json
-  end
-  session = session_status[:message]
-  
-  login_status = SLCM.login_user(username, password, session)
-  unless login_status[:success]
-    return login_status.to_json
-  end
+  semester = auth_status[:semester]
+  session = auth_status[:session]
 
   academics_html_success, academics_html = SLCM.get_academics_page(session)
   unless academics_html_success
-    return Utils.send_status(false, 'An error occured.').to_json
+    return Utils.send_failure()
   end
 
   viewstate, eventvalidation = Parser.get_auth(academics_html)
 
   html_success, html = SLCM.get_marks_info(session, viewstate, eventvalidation, semester)
   unless html_success
-    return Utils.send_status(false, 'An error occured.').to_json
+    return Utils.send_failure()
   end
 
   details = Parser.get_internal_marks(html)

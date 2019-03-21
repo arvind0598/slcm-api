@@ -2,13 +2,17 @@ class Utils
   def self.send_status(status, message = nil)
     { success: status, message: message }
   end
+
+  def self.send_failure
+    send_status(false, 'An error occured.').to_json
+  end
   
   def self.check_credentials(data)
     username = data['username']
     password = data['password']
     error = nil
     if username.nil? || password.nil? || !username.match(/^(\d){9}$/)
-      error = { success: false, message: 'Invalid Credentials.'}.to_json
+      error = send_status(false, 'Invalid Credentials')
     end
     return username, password, error
   end
@@ -42,5 +46,53 @@ class Utils
       return send_status(false, 'Invalid semester.')
     end
     return send_status(!status.nil?, status)
+  end
+
+  def self.auth_request(data)
+    username, password, error = check_credentials(data)
+
+    unless error.nil? 
+      return error 
+    end
+
+    session_status = SLCM.get_session_cookie()
+    unless session_status[:success]
+      return session_status
+    end
+    session = session_status[:message]
+    
+    login_status = SLCM.login_user(username, password, session)
+    unless login_status[:success]
+      return login_status
+    end
+
+    send_status(true, session)
+  end
+
+  def self.auth_request_with_semester(data)
+    username, password, error = check_credentials(data)
+
+    unless error.nil? 
+      return error 
+    end
+
+    semester_status = Utils.check_semester(data)
+    unless semester_status[:success]
+      return semester_status
+    end
+    semester = semester_status[:message]
+
+    session_status = SLCM.get_session_cookie()
+    unless session_status[:success]
+      return session_status
+    end
+    session = session_status[:message]
+    
+    login_status = SLCM.login_user(username, password, session)
+    unless login_status[:success]
+      return login_status
+    end
+
+    { success: true, session: session, semester: semester }
   end
 end  
