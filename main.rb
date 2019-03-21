@@ -14,7 +14,7 @@ post '/login' do
   content_type :json
   data = JSON.parse(request.body.read)
   username, password, error = Utils.check_credentials(data)
-  
+
   unless error.nil? 
     return error 
   end
